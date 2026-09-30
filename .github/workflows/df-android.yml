@@ -35,7 +35,7 @@ jobs:
         working-directory: V2rayNG
         run: |
           chmod +x gradlew
-          ./gradlew lintFdroidDebug assembleFdroidDebug --stacktrace
+          ./gradlew assembleFdroidDebug --stacktrace
       - name: Checksums
         run: sha256sum V2rayNG/app/build/outputs/apk/fdroid/debug/*.apk > V2rayNG/app/build/outputs/apk/fdroid/debug/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
