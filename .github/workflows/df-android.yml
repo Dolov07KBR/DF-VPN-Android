@@ -16,9 +16,20 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
           cache: gradle
           cache-dependency-path: V2rayNG/*.gradle.kts
+      - name: Install native build dependencies
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;29.0.14206865"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.14206865" >> $GITHUB_ENV
+          bash compile-hevtun.sh
+          mkdir -p V2rayNG/app/libs
+          cp -r libs/* V2rayNG/app/libs/
+      - name: Download Xray core
+        run: |
+          TAG=$(git -C AndroidLibXrayLite describe --tags --abbrev=0)
+          curl -fL "https://github.com/2dust/AndroidLibXrayLite/releases/download/${TAG}/libv2ray.aar" -o V2rayNG/app/libs/libv2ray.aar
       - name: Build debug APK
         working-directory: V2rayNG
         run: |
