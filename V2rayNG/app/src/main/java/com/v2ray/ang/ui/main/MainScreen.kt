@@ -1,10 +1,13 @@
 package com.v2ray.ang.ui.main
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -186,14 +189,7 @@ fun MainScreen(
                     }
                 )
             },
-            bottomBar = {
-                MainBottomBar(
-                    displayText = displayText,
-                    isRunning = isRunning,
-                    isDarkTheme = isDarkTheme,
-                    onAction = onAction
-                )
-            },
+            bottomBar = {},
             floatingActionButton = {},
         ) { innerPadding ->
             val layoutDirection = LocalLayoutDirection.current
@@ -204,6 +200,11 @@ fun MainScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
+                    DfConnectionHero(
+                        isRunning = isRunning,
+                        status = displayText,
+                        onToggle = { onAction(MainAction.ToggleService) }
+                    )
                     DfSmartRouteCard(
                         isRunning = isRunning,
                         isTesting = uiState.isTesting,
@@ -318,5 +319,65 @@ private fun DfSmartRouteCard(
                 )
             }
         }
+    }
+}
+
+
+@Composable
+private fun DfConnectionHero(
+    isRunning: Boolean,
+    status: String,
+    onToggle: () -> Unit,
+) {
+    androidx.compose.foundation.layout.Column(
+        modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp),
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+    ) {
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier
+                .size(154.dp)
+                .background(
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = .10f),
+                    shape = androidx.compose.foundation.shape.CircleShape
+                ),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .size(124.dp)
+                    .background(
+                        color = if (isRunning) androidx.compose.material3.MaterialTheme.colorScheme.secondary
+                        else androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                        shape = androidx.compose.foundation.shape.CircleShape
+                    )
+                    .clickable(onClick = onToggle),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                androidx.compose.material3.Icon(
+                    painter = androidx.compose.ui.res.painterResource(
+                        if (isRunning) com.v2ray.ang.R.drawable.ic_stop_24dp
+                        else com.v2ray.ang.R.drawable.ic_play_24dp
+                    ),
+                    contentDescription = androidx.compose.ui.res.stringResource(
+                        if (isRunning) com.v2ray.ang.R.string.acc_stop
+                        else com.v2ray.ang.R.string.acc_start
+                    ),
+                    tint = androidx.compose.ui.graphics.Color.White,
+                    modifier = Modifier.size(42.dp)
+                )
+            }
+        }
+        androidx.compose.material3.Text(
+            text = if (isRunning) "DF VPN • ON" else "DF VPN • OFF",
+            style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+            color = if (isRunning) androidx.compose.material3.MaterialTheme.colorScheme.secondary
+            else androidx.compose.material3.MaterialTheme.colorScheme.onSurface
+        )
+        androidx.compose.material3.Text(
+            text = status,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 2
+        )
     }
 }
