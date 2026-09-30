@@ -202,6 +202,11 @@ fun MainScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
+                    DfSmartRouteCard(
+                        isRunning = isRunning,
+                        isTesting = uiState.isTesting,
+                        onSelectBest = { onAction(MainAction.AutoSelectBestServer) }
+                    )
                     if (groups.size > 1) {
                         GroupTabBar(
                             groups = groups,
@@ -254,6 +259,61 @@ fun MainScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DfSmartRouteCard(
+    isRunning: Boolean,
+    isTesting: Boolean,
+    onSelectBest: () -> Unit,
+) {
+    androidx.compose.material3.Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp)
+        ) {
+            androidx.compose.material3.Surface(
+                modifier = Modifier.size(52.dp),
+                shape = androidx.compose.foundation.shape.CircleShape,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+            ) {
+                androidx.compose.foundation.layout.Box(contentAlignment = androidx.compose.ui.Alignment.Center) {
+                    androidx.compose.material3.Text("DF", color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
+                        style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+                }
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                androidx.compose.material3.Text(
+                    androidx.compose.ui.res.stringResource(com.v2ray.ang.R.string.df_smart_route),
+                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium
+                )
+                androidx.compose.material3.Text(
+                    if (isTesting) androidx.compose.ui.res.stringResource(com.v2ray.ang.R.string.connection_test_testing)
+                    else androidx.compose.ui.res.stringResource(com.v2ray.ang.R.string.df_smart_route_subtitle),
+                    style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = .72f)
+                )
+            }
+            androidx.compose.material3.FilledTonalIconButton(
+                onClick = onSelectBest,
+                enabled = !isTesting
+            ) {
+                androidx.compose.material3.Icon(
+                    painter = androidx.compose.ui.res.painterResource(com.v2ray.ang.R.drawable.ic_check_update_24dp),
+                    contentDescription = androidx.compose.ui.res.stringResource(com.v2ray.ang.R.string.df_smart_route)
+                )
             }
         }
     }

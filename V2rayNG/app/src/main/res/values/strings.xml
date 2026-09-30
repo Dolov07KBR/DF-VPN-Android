@@ -561,4 +561,8 @@
     <string name="connection_test_empty_message">no details available</string>
     <string name="value_unknown">unknown</string>
 
+
+    <string name="df_smart_route">Smart Route</string>
+    <string name="df_smart_route_subtitle">Find the fastest available server</string>
+    <string name="df_best_server_selected">Best server selected</string>
 </resources>

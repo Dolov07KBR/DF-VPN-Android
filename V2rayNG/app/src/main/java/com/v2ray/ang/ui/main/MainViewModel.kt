@@ -108,6 +108,7 @@ class MainViewModel(
 
     private val testRequests = MainTestRequests()
     private var bulkTestJob: Job? = null
+    private var selectBestAfterTest = false
 
     private val initialPageReady = CompletableDeferred<Unit>()
 
@@ -278,6 +279,7 @@ class MainViewModel(
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
             MainAction.TestAllServers -> testAllRealPing(true)
             MainAction.TestRealAllServers -> testAllRealPing()
+            MainAction.AutoSelectBestServer -> autoSelectBestServer()
             MainAction.CancelTesting -> cancelAllPing()
             MainAction.RemoveAllServers -> removeAllServerAsync()
             MainAction.RemoveDuplicateServers -> removeDuplicateServerAsync()
@@ -892,11 +894,35 @@ class MainViewModel(
 
     private fun onTestsFinished(requestId: String) {
         if (testRequests.completeBulk(requestId) == null) return
+        if (selectBestAfterTest) {
+            selectBestAfterTest = false
+            selectBestFromMeasuredServers()
+        }
         resetTestStatus()
         viewModelScope.launch(ioDispatcher) {
             cacheMutex.withLock { groupDataCache.clear() }
             reloadAllGroups(_uiState.value.groups.map { it.id })
         }
+    }
+
+
+    /** DF Smart Route: measure the active subscription and select its fastest reachable node. */
+    private fun autoSelectBestServer() {
+        val measured = currentServers().filter { it.testDelayMillis > 0 }
+        if (measured.isNotEmpty()) {
+            selectBestFromMeasuredServers()
+        } else {
+            selectBestAfterTest = true
+            testAllRealPing()
+        }
+    }
+
+    private fun selectBestFromMeasuredServers() {
+        val best = currentServers()
+            .filter { it.testDelayMillis > 0 }
+            .minByOrNull { it.testDelayMillis } ?: return
+        updateSelectedGuid(best.guid)
+        toastSuccess(R.string.df_best_server_selected)
     }
 
     fun triggerLocateSelectedServer() {

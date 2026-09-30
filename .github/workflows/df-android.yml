@@ -23,12 +23,12 @@ jobs:
         working-directory: V2rayNG
         run: |
           chmod +x gradlew
-          ./gradlew lintDebug assembleDebug --stacktrace
+          ./gradlew lintFdroidDebug assembleFdroidDebug --stacktrace
       - name: Checksums
-        run: sha256sum V2rayNG/app/build/outputs/apk/debug/*.apk > V2rayNG/app/build/outputs/apk/debug/SHA256SUMS.txt
+        run: sha256sum V2rayNG/app/build/outputs/apk/fdroid/debug/*.apk > V2rayNG/app/build/outputs/apk/fdroid/debug/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: DF-VPN-debug-APK
           path: |
-            V2rayNG/app/build/outputs/apk/debug/*.apk
-            V2rayNG/app/build/outputs/apk/debug/SHA256SUMS.txt
+            V2rayNG/app/build/outputs/apk/fdroid/debug/*.apk
+            V2rayNG/app/build/outputs/apk/fdroid/debug/SHA256SUMS.txt

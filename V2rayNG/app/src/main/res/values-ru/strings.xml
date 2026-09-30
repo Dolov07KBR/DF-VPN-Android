@@ -565,4 +565,8 @@
     <string name="connection_test_empty_message">подробности отсутствуют</string>
     <string name="value_unknown">неизвестно</string>
 
+
+    <string name="df_smart_route">Умный маршрут</string>
+    <string name="df_smart_route_subtitle">Найти самый быстрый доступный сервер</string>
+    <string name="df_best_server_selected">Лучший сервер выбран</string>
 </resources>
