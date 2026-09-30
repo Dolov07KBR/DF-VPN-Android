@@ -80,6 +80,7 @@ class MainViewModel(
         MainUiState(
             selectedGroupId = dataSource.getSelectedSubscriptionId(),
             selectedGuid = dataSource.getSelectServer(),
+            subscriptionInfo = dataSource.getSubscriptionItem(dataSource.getSelectedSubscriptionId()),
             confirmRemove = dataSource.getConfirmRemove(),
             doubleColumnDisplay = dataSource.getDoubleColumnDisplay()
         )
@@ -717,7 +718,10 @@ class MainViewModel(
         mutableServerGroupState(id)
         if (uiState.value.selectedGroupId != id) {
             dataSource.setSelectedSubscriptionId(id)
-            _uiState.update { it.copy(selectedGroupId = id) }
+            _uiState.update { it.copy(
+                selectedGroupId = id,
+                subscriptionInfo = dataSource.getSubscriptionItem(id)
+            ) }
         }
         selectedGroupLoadJob?.cancel()
         selectedGroupLoadJob = viewModelScope.launch(ioDispatcher) {

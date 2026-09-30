@@ -204,6 +204,9 @@ fun MainScreen(
                         status = displayText,
                         onToggle = { onAction(MainAction.ToggleService) }
                     )
+                    uiState.subscriptionInfo?.let { subscription ->
+                        DfSubscriptionUsageCard(subscription)
+                    }
                     DfSmartRouteCard(
                         isRunning = isRunning,
                         isTesting = uiState.isTesting,
@@ -378,5 +381,51 @@ private fun DfConnectionHero(
             color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 2
         )
+    }
+}
+
+
+@Composable
+private fun DfSubscriptionUsageCard(subscription: com.v2ray.ang.dto.entities.SubscriptionItem) {
+    val used = (subscription.trafficUpload + subscription.trafficDownload).coerceAtLeast(0)
+    val total = subscription.trafficTotal.coerceAtLeast(0)
+    val progress = if (total > 0) (used.toFloat() / total.toFloat()).coerceIn(0f, 1f) else 0f
+    fun bytes(value: Long): String {
+        if (value <= 0) return "0 Б"
+        val units = arrayOf("Б", "КБ", "МБ", "ГБ", "ТБ")
+        var number = value.toDouble(); var index = 0
+        while (number >= 1024 && index < units.lastIndex) { number /= 1024; index++ }
+        return if (number >= 10 || index == 0) "%.0f %s".format(number, units[index]) else "%.1f %s".format(number, units[index])
+    }
+    val expiry = if (subscription.trafficExpire > 0) {
+        java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+            .format(java.util.Date(subscription.trafficExpire * 1000))
+    } else "∞"
+    androidx.compose.material3.Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+        colors = androidx.compose.material3.CardDefaults.cardColors(
+            containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth().padding(16.dp)) {
+            androidx.compose.material3.Text(subscription.remarks, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+            androidx.compose.foundation.layout.Row(Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween) {
+                androidx.compose.material3.Text("Использовано: ${bytes(used)}")
+                androidx.compose.material3.Text(if (total > 0) "Лимит: ${bytes(total)}" else "Безлимит")
+            }
+            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { progress }, modifier = Modifier.fillMaxWidth(),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.secondary
+            )
+            androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+            androidx.compose.material3.Text(
+                if (total > 0) "Осталось: ${bytes((total-used).coerceAtLeast(0))}  •  Истекает: $expiry" else "Истекает: $expiry",
+                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
