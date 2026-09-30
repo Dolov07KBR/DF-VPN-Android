@@ -22,7 +22,8 @@ jobs:
       - name: Install native build dependencies
         run: |
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;29.0.14206865"
-          echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.14206865" >> $GITHUB_ENV
+          export NDK_HOME="$ANDROID_HOME/ndk/29.0.14206865"
+          echo "NDK_HOME=$NDK_HOME" >> $GITHUB_ENV
           bash compile-hevtun.sh
           mkdir -p V2rayNG/app/libs
           cp -r libs/* V2rayNG/app/libs/
