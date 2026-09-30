@@ -38,7 +38,7 @@ jobs:
           ./gradlew assembleFdroidDebug --stacktrace
       - name: Checksums
         run: sha256sum V2rayNG/app/build/outputs/apk/fdroid/debug/*.apk > V2rayNG/app/build/outputs/apk/fdroid/debug/SHA256SUMS.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: DF-VPN-debug-APK
           path: |
