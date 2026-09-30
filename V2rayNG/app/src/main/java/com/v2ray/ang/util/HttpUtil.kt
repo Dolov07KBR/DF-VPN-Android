@@ -193,6 +193,9 @@ object HttpUtil {
                     }
 
                     response.isSuccessful -> {
+                        request.onResponseHeaders?.invoke(
+                            response.headers.toMultimap().mapValues { it.value.joinToString(",") }
+                        )
                         return response.body?.string() ?: ""
                     }
 

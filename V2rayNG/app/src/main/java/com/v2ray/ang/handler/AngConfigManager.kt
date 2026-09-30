@@ -488,6 +488,21 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
+            val captureSubscriptionInfo: (Map<String, String>) -> Unit = { headers ->
+                headers.entries.firstOrNull { entry ->
+                    entry.key.equals("subscription-userinfo", ignoreCase = true)
+                }?.value?.let { value ->
+                    val values = value.split(';').mapNotNull { part ->
+                        val pair = part.trim().split('=', limit = 2)
+                        if (pair.size == 2) pair[0].trim().lowercase() to pair[1].trim().toLongOrNull() else null
+                    }.toMap()
+                    it.subscription.trafficUpload = values["upload"] ?: 0L
+                    it.subscription.trafficDownload = values["download"] ?: 0L
+                    it.subscription.trafficTotal = values["total"] ?: 0L
+                    it.subscription.trafficExpire = values["expire"] ?: 0L
+                }
+            }
+
             var configText = try {
                 val httpPort = SettingsManager.getHttpPort()
                 HttpUtil.getUrlContentWithUserAgent(
@@ -498,7 +513,8 @@ object AngConfigManager {
                         timeout = 15000,
                         httpPort = httpPort,
                         proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword
+                        proxyPassword = proxyPassword,
+                        onResponseHeaders = captureSubscriptionInfo
                     )
                 )
             } catch (e: Exception) {
@@ -511,7 +527,8 @@ object AngConfigManager {
                         UrlContentRequest(
                             url = url,
                             userAgent = userAgent,
-                            requestHeaders = requestHeaders
+                            requestHeaders = requestHeaders,
+                            onResponseHeaders = captureSubscriptionInfo
                         )
                     )
                 } catch (e: Exception) {
