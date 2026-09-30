@@ -10,7 +10,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.v2ray.ang"
+        applicationId = "com.dolov07kbr.dfvpn"
         minSdk = 24
         targetSdk = 37
         versionCode = 749
